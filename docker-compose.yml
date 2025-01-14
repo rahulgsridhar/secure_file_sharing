@@ -13,9 +13,12 @@ services:
     build:
       context: ./backend
     ports:
-      - "8000:8000"
+      - "443:443"  # Expose port 443 for HTTPS
     networks:
       - app-network
+    volumes:
+      - ./backend/server.key:/etc/ssl/private/server.key  # Map server.key for SSL
+      - ./backend/server.crt:/etc/ssl/certs/server.crt  # Map server.crt for SSL
 
 networks:
   app-network:

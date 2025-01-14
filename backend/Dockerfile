@@ -17,12 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the backend code
 COPY . .
 
-# Copy the SSL certificates from the backend folder to the container
-COPY ./backend/server.key /etc/ssl/private/server.key
-COPY ./backend/server.crt /etc/ssl/certs/server.crt
-
-# Expose port 443 for SSL traffic
+# Expose port 443 for HTTPS
 EXPOSE 443
 
-# Command to run the application using uvicorn with SSL enabled
+# Run uvicorn with SSL configuration
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "443", "--ssl-keyfile", "/etc/ssl/private/server.key", "--ssl-certfile", "/etc/ssl/certs/server.crt", "--reload"]
