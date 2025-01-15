@@ -103,7 +103,7 @@ const UserProfile = () => {
 
     return (
       <Container className="mt-5">
-        <Row className="mb-4">
+        <Row className="mb-4" >
           {/* User Profile on the Left */}
           <Col lg={4} md={6}>
             <Card>
@@ -113,7 +113,7 @@ const UserProfile = () => {
                   {user.email}
                 </Card.Subtitle>
                 <Card.Text>
-                  This is your profile page. You can update your details here.
+                  This is your profile page.
                 </Card.Text>
               </Card.Body>
             </Card>

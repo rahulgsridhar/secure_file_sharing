@@ -10,7 +10,7 @@ import Login from './components/Login'; // Login component
 import FileUpload from './components/FileUpload'; // File upload component
 import FileShare from './components/FileShare'; // File share component
 import { useDispatch } from 'react-redux';
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col,Spinner } from 'react-bootstrap';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,9 +46,14 @@ function App() {
     setIsAuthenticated(false); // Set authentication to false
   };
 
-  // If loading, show a loading spinner or message
+  // If loading, show a loading spinner
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="loading-container">
+        <Spinner animation="border" variant="primary" size="lg" />
+        <p>Loading...</p>
+      </div>
+    );
   }
 
   return (
@@ -61,7 +66,7 @@ function App() {
           user={user} // Pass logout handler to Navbar
         />
         <Container fluid className="d-flex justify-content-center align-items-center" style={{ backgroundColor: '#f8f9fa' }}>
-          <Row>
+          <Row style={{width:"100%"}}>
             <Col>
               <Routes>
                 {/* Redirect to /login as default */}

@@ -225,7 +225,7 @@ const FileUpload = () => {
         <>
           <h3>Upload File</h3>
           <Form>
-            <Form.Group controlId="formFile" className="mb-3">
+            <Form.Group controlId="formFile" className="mb-3" style={{width:"fit-content"}}>
               <Form.Label>Choose file to upload</Form.Label>
               <Form.Control
                 type="file"
