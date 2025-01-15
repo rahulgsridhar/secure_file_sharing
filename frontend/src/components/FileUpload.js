@@ -70,13 +70,18 @@ const FileUpload = () => {
 
   const fetchUsers = async () => {
     const accessToken = sessionStorage.getItem("access_token");
+    const loggedInUser = JSON.parse(sessionStorage.getItem("user"));
     try {
       const response = await axios.get("https://localhost:443/users", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      setUsers(response.data);
+      // Filter out the logged-in user
+      const filteredUsers = response.data.filter(
+        (user) => user.username !== loggedInUser.username
+      );
+      setUsers(filteredUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -156,14 +161,11 @@ const FileUpload = () => {
   const deleteFile = async () => {
     const accessToken = sessionStorage.getItem("access_token");
     try {
-      await axios.delete(
-        `https://localhost:443/files/${fileIdToDelete}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      await axios.delete(`https://localhost:443/files/${fileIdToDelete}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       setMessage("File deleted successfully");
       fetchFiles();
       setShowDeleteModal(false);
@@ -225,9 +227,24 @@ const FileUpload = () => {
           <Form>
             <Form.Group controlId="formFile" className="mb-3">
               <Form.Label>Choose file to upload</Form.Label>
-              <Form.Control type="file" onChange={onFileChange} />
+              <Form.Control
+                type="file"
+                onChange={onFileChange}
+                style={{
+                  transition: "0.3s ease-in-out",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                }}
+              />
             </Form.Group>
-            <Button variant="primary" onClick={onUpload} disabled={!file}>
+            <Button
+              variant="primary"
+              onClick={onUpload}
+              disabled={!file}
+              style={{
+                transition: "0.3s ease-in-out",
+              }}
+            >
               Upload
             </Button>
           </Form>
@@ -249,10 +266,18 @@ const FileUpload = () => {
           <thead>
             <tr>
               <th>File Name</th>
-              <th>Download</th>
-              <th>View</th>
-              {userRole === "Admin" && <th>Delete</th>}
-              {userRole === "Admin" && <th>Share</th>}
+              {userRole !== "Guest" && (
+                <>
+                  <th>Download</th>
+                  <th>View</th>
+                </>
+              )}
+              {userRole === "Admin" && (
+                <>
+                  <th>Delete</th>
+                  <th>Share</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -329,13 +354,16 @@ const FileUpload = () => {
             <select
               multiple
               onChange={(e) => {
-                const selectedValues = Array.from(e.target.selectedOptions, option => option.value);
+                const selectedValues = Array.from(
+                  e.target.selectedOptions,
+                  (option) => option.value
+                );
                 setSelectedUsers(selectedValues);
               }}
               className="form-control"
             >
               {users.map((user) => (
-                <option key={user.id} value={user.id}>
+                <option key={user.id} value={user.id} className="option-text">
                   {user.username}
                 </option>
               ))}
@@ -344,21 +372,23 @@ const FileUpload = () => {
           <div className="mt-2">
             <label>Permission:</label>
             <DropdownButton
-              id="dropdown-permission"
-              title={permission}
-              onSelect={setPermission}
+              id="dropdown-basic-button"
+              title={permission === "view" ? "View" : "Download"}
+              onSelect={(eventKey) => setPermission(eventKey)}
             >
               <Dropdown.Item eventKey="view">View</Dropdown.Item>
               <Dropdown.Item eventKey="download">Download</Dropdown.Item>
             </DropdownButton>
           </div>
           <div className="mt-2">
-            <label>Expiration Time (minutes):</label>
+            <label>Expiration (minutes):</label>
             <input
               type="number"
               className="form-control"
               value={expirationMinutes}
-              onChange={(e) => setExpirationMinutes(e.target.value)}
+              onChange={(e) =>
+                setExpirationMinutes(Math.max(1, e.target.value))
+              }
             />
           </div>
         </Modal.Body>
@@ -367,7 +397,7 @@ const FileUpload = () => {
             Close
           </Button>
           <Button variant="primary" onClick={handleShareFile}>
-            Share
+            Share File
           </Button>
         </Modal.Footer>
       </Modal>

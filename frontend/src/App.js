@@ -16,7 +16,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true); // Loading state
   const dispatch = useDispatch();
-
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  
   // Check if user is authenticated on page load
   useEffect(() => {
     const token = sessionStorage.getItem('access_token');
@@ -56,7 +57,8 @@ function App() {
         <NavigationBar 
           isAuthenticated={isAuthenticated} 
           setIsAuthenticated={setIsAuthenticated} 
-          handleLogout={handleLogout} // Pass logout handler to Navbar
+          handleLogout={handleLogout}
+          user={user} // Pass logout handler to Navbar
         />
         <Container fluid className="d-flex justify-content-center align-items-center" style={{ backgroundColor: '#f8f9fa' }}>
           <Row>

@@ -1,7 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Card, Button, Table, Container, Spinner, Modal, Form } from 'react-bootstrap';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import {
+  Card,
+  Button,
+  Table,
+  Container,
+  Spinner,
+  Modal,
+  Form,
+  Row,
+  Col,
+} from "react-bootstrap";
+import axios from "axios";
 
 const UserProfile = () => {
   const user = useSelector((state) => state.user); // Access the user from Redux store
@@ -10,23 +20,23 @@ const UserProfile = () => {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [newUser, setNewUser] = useState({
-    username: '',
-    email: '',
-    password: '',
-    role: 'Guest',  // Default role set to 'Guest'
+    username: "",
+    email: "",
+    password: "",
+    role: "Guest", // Default role set to 'Guest'
   });
 
   // Fetch users if role is Admin
   useEffect(() => {
-    if (user?.role === 'Admin') {
+    if (user?.role === "Admin") {
       axios
-        .get('https://localhost:443/users')
+        .get("https://localhost:443/users")
         .then((response) => {
           setUsers(response.data);
           setLoading(false);
         })
         .catch((err) => {
-          setError('Failed to load users');
+          setError("Failed to load users");
           setLoading(false);
         });
     }
@@ -39,30 +49,29 @@ const UserProfile = () => {
         setUsers(users.filter((user) => user.id !== userId));
       })
       .catch(() => {
-        setError('Failed to delete user');
+        setError("Failed to delete user");
       });
   };
 
   const handleAddUser = () => {
     axios
-      .post('https://localhost:443/register', newUser)
+      .post("https://localhost:443/register", newUser)
       .then(() => {
         // After successfully adding the user, fetch the list of users again
         axios
-          .get('https://localhost:443/users')
+          .get("https://localhost:443/users")
           .then((response) => {
             setUsers(response.data);
             setShowModal(false);
           })
           .catch(() => {
-            setError('Failed to load users');
+            setError("Failed to load users");
           });
       })
       .catch(() => {
-        setError('Failed to add user');
+        setError("Failed to add user");
       });
   };
-  
 
   if (!user) {
     return (
@@ -74,7 +83,7 @@ const UserProfile = () => {
     );
   }
 
-  if (user.role === 'Admin') {
+  if (user.role === "Admin") {
     if (loading) {
       return (
         <div className="text-center mt-5">
@@ -94,39 +103,70 @@ const UserProfile = () => {
 
     return (
       <Container className="mt-5">
-        <div className="d-flex justify-content-between mb-3">
-          <h2>All Users</h2>
-          <Button variant="success" onClick={() => setShowModal(true)}>
-            Add User
-          </Button>
-        </div>
+        <Row className="mb-4">
+          {/* User Profile on the Left */}
+          <Col lg={4} md={6}>
+            <Card>
+              <Card.Body>
+                <Card.Title>{user.username}</Card.Title>
+                <Card.Subtitle className="mb-2 text-muted">
+                  {user.email}
+                </Card.Subtitle>
+                <Card.Text>
+                  This is your profile page. You can update your details here.
+                </Card.Text>
+              </Card.Body>
+            </Card>
+          </Col>
 
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
-                <td>
-                  <Button variant="danger" onClick={() => handleDelete(user.id)}>
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
+          {/* User List Table on the Right */}
+          <Col lg={8} md={6}>
+            <div className="d-flex justify-content-between mb-3">
+              <h2>All Users</h2>
+              <Button variant="success" onClick={() => setShowModal(true)}>
+                Add User
+              </Button>
+            </div>
+
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.filter((u) => u.username !== user.username).length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center">
+                      No users present
+                    </td>
+                  </tr>
+                ) : (
+                  users
+                    .filter((u) => u.username !== user.username) // Exclude the logged-in user
+                    .map((filteredUser) => (
+                      <tr key={filteredUser.id}>
+                        <td>{filteredUser.username}</td>
+                        <td>{filteredUser.email}</td>
+                        <td>{filteredUser.role}</td>
+                        <td>
+                          <Button
+                            variant="danger"
+                            onClick={() => handleDelete(filteredUser.id)}
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                )}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
 
         {/* Add User Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -140,7 +180,9 @@ const UserProfile = () => {
                 <Form.Control
                   type="text"
                   value={newUser.username}
-                  onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, username: e.target.value })
+                  }
                   placeholder="Enter username"
                 />
               </Form.Group>
@@ -149,7 +191,9 @@ const UserProfile = () => {
                 <Form.Control
                   type="email"
                   value={newUser.email}
-                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, email: e.target.value })
+                  }
                   placeholder="Enter email"
                 />
               </Form.Group>
@@ -158,7 +202,9 @@ const UserProfile = () => {
                 <Form.Control
                   type="password"
                   value={newUser.password}
-                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, password: e.target.value })
+                  }
                   placeholder="Enter password"
                 />
               </Form.Group>
@@ -167,11 +213,13 @@ const UserProfile = () => {
                 <Form.Control
                   as="select"
                   value={newUser.role}
-                  onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
+                  onChange={(e) =>
+                    setNewUser({ ...newUser, role: e.target.value })
+                  }
                 >
                   <option>Guest</option>
                   <option>Admin</option>
-                  <option>Regular User</option>  {/* New role option */}
+                  <option>Regular User</option> {/* New role option */}
                 </Form.Control>
               </Form.Group>
             </Form>
@@ -192,12 +240,14 @@ const UserProfile = () => {
   // Default case: Display the current user's profile information
   return (
     <div className="text-center mt-5">
-      <Card style={{ width: '18rem' }} className="mx-auto">
+      <Card style={{ width: "18rem" }} className="mx-auto">
         <Card.Body>
           <Card.Title>{user.username}</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">{user.email}</Card.Subtitle>
+          <Card.Subtitle className="mb-2 text-muted">
+            {user.email}
+          </Card.Subtitle>
           <Card.Text>
-            This is your profile page. You can update your details here.
+            This is your profile page.
           </Card.Text>
         </Card.Body>
       </Card>

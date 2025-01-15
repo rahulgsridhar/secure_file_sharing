@@ -329,7 +329,7 @@ async def get_user_files(
             raise HTTPException(status_code=404, detail="User not found")
 
         # Fetch the user's files from the database (without file_data)
-        files = db.query(models.File.id, models.File.file_name).filter(models.File.owner_id == user.id).all()
+        files = db.query(models.File.id, models.File.file_name, models.File.permission).filter(models.File.owner_id == user.id).all()
         
         # Return a list of FileMetadata models
         return files
@@ -436,6 +436,29 @@ async def share_file(share_request: schemas.ShareLinkRequest, db: Session = Depe
     )
 
     db.add(new_share_link)
+
+    # Add the file for each user in user_ids
+    for user_id in share_request.user_ids:
+        new_file_entry = models.SharedFile(
+            file_id=share_request.file_id,
+            permission=share_request.permission,
+            shared_user_id=user_id
+        )
+        db.add(new_file_entry)
+
+    # Encrypt the file content for sharing
+    encryption_key = "your_secure_key_256"  # Use a proper key management system
+
+    # Add the file for each user in user_ids
+    for user_id in share_request.user_ids:
+        new_file_entry = models.File(
+            file_name=file.file_name,
+            file_data=file.file_data,
+            encryption_key=encryption_key,
+            owner_id=user_id,
+            permission=share_request.permission,
+        )
+        db.add(new_file_entry)
     db.commit()
 
     # Return the generated share link and expiration details

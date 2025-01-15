@@ -58,6 +58,7 @@ class RegisterResponse(BaseModel):
 class FileMetadata(BaseModel):
     id: int
     file_name: str
+    permission: Optional[str]
 
     class Config:
         orm_mode = True  # Tells Pydantic to treat ORM models as dicts

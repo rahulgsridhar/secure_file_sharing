@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../actions/authActions';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 
-function NavigationBar({ isAuthenticated, setIsAuthenticated, handleLogout }) {
+function NavigationBar({ isAuthenticated, setIsAuthenticated, handleLogout,user }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();  // Get the current location
@@ -27,8 +27,11 @@ function NavigationBar({ isAuthenticated, setIsAuthenticated, handleLogout }) {
             {isAuthenticated && (
               <>
                 <Nav.Link as={Link} to="/profile" active={location.pathname === '/profile'}>Profile</Nav.Link>
-                <Nav.Link as={Link} to="/upload" active={location.pathname === '/upload'}>File Upload</Nav.Link>
-                {/* <Nav.Link as={Link} to="/share" active={location.pathname === '/share'}>File Share</Nav.Link> */}
+                {user.role === "Guest" ? (
+                  <Nav.Link as={Link} to="/upload" active={location.pathname === '/upload'}>Shared Files</Nav.Link>
+                ) : (
+                  <Nav.Link as={Link} to="/upload" active={location.pathname === '/upload'}>File Upload</Nav.Link>
+                )}
               </>
             )}
           </Nav>

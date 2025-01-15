@@ -28,6 +28,7 @@ class File(Base):
     file_data = Column(LargeBinary, nullable=False)  # File content as binary data
     owner_id = Column(Integer, ForeignKey('users.id'))  # Foreign key to User table
     encryption_key = Column(String, nullable=False, default="default_encryption_key")
+    permission = Column(String,nullable=True)  # Define permission types (e.g., "read", "write", etc.)
     owner = relationship("User", back_populates="files")
     # Assuming you have a ShareLink model related to File
     share_links = relationship('ShareLink', back_populates='file')
