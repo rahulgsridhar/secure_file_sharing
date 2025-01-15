@@ -90,7 +90,7 @@ Step 3: Add to System PATH:
   Find the Path variable under System variables, and click Edit.
   Click New, and add the path to the bin folder (e.g., C:\Program Files\OpenSSL-Win64\bin).
   Click OK to save.
-For local development, generate self-signed certificates:
+For local development, generate self-signed certificates and make sure current directory is used to store .pem file:
 
 ```bash
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem
