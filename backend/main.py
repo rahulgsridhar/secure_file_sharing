@@ -77,14 +77,6 @@ app.add_middleware(
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
-# # Database session
-# def get_db():
-#     db_session = db.SessionLocal()
-#     try:
-#         yield db_session
-#     finally:
-#         db_session.close()
-
 # JWT Secret
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
@@ -123,6 +115,7 @@ def get_file_from_database(file_id: int, db: Session):
     
     # Return the file object directly
     return file
+
 def encrypt_file(file_content: bytes, encryption_key: str) -> bytes:
     # Ensure the encryption key is 32 bytes (256 bits) for AES-256
     key = hashlib.sha256(encryption_key.encode('utf-8')).digest()  # Hash the key to 32 bytes
@@ -140,8 +133,6 @@ def encrypt_file(file_content: bytes, encryption_key: str) -> bytes:
     # Return encrypted file with IV concatenated (stored as base64)
     return base64.b64encode(iv + encrypted_data)
 
-
-
 def decrypt_file(encrypted_data: bytes, encryption_key: str) -> bytes:
     # Ensure the encryption key is 32 bytes (256 bits) for AES-256
     key = hashlib.sha256(encryption_key.encode('utf-8')).digest()  # Hash the key to 32 bytes
@@ -156,8 +147,6 @@ def decrypt_file(encrypted_data: bytes, encryption_key: str) -> bytes:
     # Remove padding
     padding_length = decrypted_content[-1]
     return decrypted_content[:-padding_length]  # Remove padding
-
-
 
 
 def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
@@ -194,14 +183,6 @@ def get_users(db: Session = Depends(get_db)):
     users = db.query(models.User).all()
     return [{"id": user.id, "username": user.username, "role": user.role,"email":user.email} for user in users]
 
-
-@app.post("/token", response_model=schemas.Token)
-async def login_for_access_token(user: schemas.User, db: Session = Depends(get_db)):
-    db_user = get_user_from_db(db, user.username)
-    if not db_user or not verify_password(user.password, db_user.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-    access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
 
 @app.post("/login", response_model=schemas.LoginResponse)
 async def login(user_credentials: schemas.LoginRequest,response: Response, db: Session = Depends(get_db)):
@@ -478,21 +459,4 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         return {"message": "User deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="User not found")
-    
-
-
-if __name__ == "__main__":
-    # Configure SSL context
-    ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ssl_context.load_cert_chain(certfile="server.crt", keyfile="server.key")
-
-    # Run Uvicorn server with SSL
-    import uvicorn
-
-    uvicorn.run(
-        "main:app",  # Refers to the `app` instance in this file
-        host="0.0.0.0",
-        port=443,  # HTTPS port
-        ssl_context=ssl_context,  # Pass the SSL context
-    )
 
