@@ -77,15 +77,19 @@ pip install -r requirements.txt
 ```
 Generate SSL/TLS Certificates:
 Step 1: Install OpenSSL
+
 If OpenSSL is installed but not recognized, you may need to manually add it to your system's PATH.
-Locate the OpenSSL Binary:
+
+Step 2: Locate the OpenSSL Binary:
+
 By default, OpenSSL is installed in C:\Program Files\OpenSSL-Win64\bin or a similar directory.
-Add to System PATH:
-Search for "Environment Variables" in the Windows Start menu.
-Under System Properties, click Environment Variables.
-Find the Path variable under System variables, and click Edit.
-Click New, and add the path to the bin folder (e.g., C:\Program Files\OpenSSL-Win64\bin).
-Click OK to save.
+
+Step 3: Add to System PATH:
+  Search for "Environment Variables" in the Windows Start menu.
+  Under System Properties, click Environment Variables.
+  Find the Path variable under System variables, and click Edit.
+  Click New, and add the path to the bin folder (e.g., C:\Program Files\OpenSSL-Win64\bin).
+  Click OK to save.
 For local development, generate self-signed certificates:
 
 ```bash
