@@ -84,12 +84,20 @@ Step 2: Locate the OpenSSL Binary:
 
 By default, OpenSSL is installed in C:\Program Files\OpenSSL-Win64\bin or a similar directory.
 
-Step 3: Add to System PATH:
+Step 3: 
+
+  Add to System PATH:
+  
   Search for "Environment Variables" in the Windows Start menu.
+  
   Under System Properties, click Environment Variables.
+  
   Find the Path variable under System variables, and click Edit.
+  
   Click New, and add the path to the bin folder (e.g., C:\Program Files\OpenSSL-Win64\bin).
+  
   Click OK to save.
+  
 For local development, generate self-signed certificates and make sure current directory is used to store .pem file:
 
 ```bash
